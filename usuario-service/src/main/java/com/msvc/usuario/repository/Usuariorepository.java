@@ -1,8 +1,7 @@
 package com.msvc.usuario.repository;
 
-import com.msvc.usuario.entity.Usuario;
+import com.msvc.usuario.entities.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
 
 public interface Usuariorepository extends JpaRepository<Usuario,String> {
 }
