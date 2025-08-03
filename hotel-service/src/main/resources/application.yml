@@ -1,7 +1,8 @@
 server:
   port: 8095
-
 spring:
+  application:
+    name: HOTEL-SERVICE
   datasource:
     url: jdbc:postgresql://localhost:5432/microservicios
     username : postgres
@@ -10,9 +11,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  application:
-    name: HOTEL-SERVICE
-
 eureka:
   instance:
     prefer-ip-address: true

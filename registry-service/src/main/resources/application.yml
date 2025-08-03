@@ -1,13 +1,8 @@
+server:
+  port: 8761
 eureka:
   instance:
     hostname: localhost
   client:
     register-with-eureka: false
     fetch-registry: false
-spring:
-  application:
-    name: registry-service
-server:
-  port: 8761
-
-
