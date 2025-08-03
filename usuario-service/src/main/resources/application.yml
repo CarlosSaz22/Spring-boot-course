@@ -2,6 +2,8 @@ server:
   port: 8091
 
 spring:
+  application:
+    name: USUARIO-SERVICE
   datasource:
     url: jdbc:mysql://localhost:3306/microservicios?allowPublicKeyRetrieval=true&useSSL=false
     username: root
@@ -14,8 +16,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-  application:
-    name: usuario-service
 
 
 eureka:
