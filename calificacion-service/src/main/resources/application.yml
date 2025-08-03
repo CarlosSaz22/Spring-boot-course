@@ -8,6 +8,8 @@ spring:
     mongodb:
       uri: mongodb://mongo:mongo@localhost:27017
       database: microservicios
+  config:
+    import: optional:configserver:http://localhost:8085
 
 eureka:
   instance:

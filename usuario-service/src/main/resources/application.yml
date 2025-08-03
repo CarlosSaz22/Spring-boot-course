@@ -1,6 +1,7 @@
 server:
   port: 8091
 
+
 spring:
   application:
     name: USUARIO-SERVICE
@@ -16,14 +17,38 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  config:
+    import: optional:configserver:http://localhost:8085
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoint:
+    health:
+      show-details: "always"
+  endpoints:
+    web:
+      exposure:
+        include: "health"
 
 
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingHotelBreaker:
+        registerHealthIndicator: true                  # Registra el circuit breaker en /actuator/health
+        eventConsumerBufferSize: 10                    # Tamaño del buffer de eventos internos del circuito
+        failureRateThreshold: 50                         # % error que abre el circuito (50% aquí)
+        minimumNumberOfCalls: 5                         # Mín. llamadas necesarias antes de evaluar el fallo
+        automaticTransitionFromOpenToHalfOpenEnabled: true  # Transición automática OPEN -> HALF_OPEN
+        waitDurationInOpenState: 6s                     # Tiempo que el circuito permanece en OPEN (6 segundos)
+        permittedNumberOfCallsInHalfOpenState: 3       # Llamadas permitidas en HALF_OPEN para prueba
+        slidingWindowSize: 10                           # Ventana de llamadas para cálculo de tasa de fallos
+        sliding-window-type: COUNT_BASED
 
+  retry:
+    instances:
+      ratingHotelService:
+        max-attempts: 3
+        wait-duration: 5s

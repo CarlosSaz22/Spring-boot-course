@@ -71,7 +71,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         List<Calificacion> listaCalificaciones = Arrays.stream(array)
                 // .parallelStream() // Descomentar si quieres hacerlo en paralelo (ten precaución)
                 .map(calificacion -> {
-                    try {
+
                         log.info("Obteniendo hotelId: {}", calificacion.getHotelId());
                        // ResponseEntity<Hotel> respuesta = restTemplate.getForEntity(
                        //         "http://HOTEL-SERVICE/hoteles/" + calificacion.getHotelId(),
@@ -81,10 +81,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         log.info("Respuesta con codigo de estado : {}", respuesta.getStatusCode());
                         Hotel hotel = respuesta.getBody();
                         calificacion.setHotel(hotel);
-                    } catch (Exception e) {
-                        log.error("Error obteniendo hotel para calificación con id {}: {}", calificacion.getCalificacionId(), e.getMessage());
-                        calificacion.setHotel(null);
-                    }
+
                     return calificacion;
                 })
                 .collect(Collectors.toList());
