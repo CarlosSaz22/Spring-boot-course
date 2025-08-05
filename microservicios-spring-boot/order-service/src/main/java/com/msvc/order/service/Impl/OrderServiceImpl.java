@@ -1,27 +1,35 @@
 package com.msvc.order.service.Impl;
 
 
+import com.msvc.order.dto.InventarioResponse;
 import com.msvc.order.dto.OrderLineItemsDto;
 import com.msvc.order.dto.OrderRequest;
 import com.msvc.order.model.Order;
 import com.msvc.order.model.OrderLineItems;
 import com.msvc.order.repository.OrderRepository;
 import com.msvc.order.service.OrderServiceI;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderServiceI {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private WebClient webClient;
 
 
     public void placeOrder(OrderRequest orderRequest) {
@@ -33,7 +41,32 @@ public class OrderServiceImpl implements OrderServiceI {
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
         order.setOrderLineItems(orderLineItems);
-        orderRepository.save(order);
+        log.info(order.toString());
+
+        List<String> codigoSku = order.getOrderLineItems().stream()
+                .map(OrderLineItems::getCodigoSku)
+                .collect(Collectors.toList());
+
+        log.info("Codigo Sku: {}", codigoSku);
+
+        InventarioResponse[] inventarioResponseArray = webClient.get()
+                .uri("http://localhost:8082/api/inventario", uriBuilder -> uriBuilder.queryParam("codigoSku", codigoSku).build())
+                .retrieve()
+                .bodyToMono(InventarioResponse[].class)
+                .block();
+
+        boolean allProductInStock= Arrays.stream(inventarioResponseArray)
+                        .allMatch(InventarioResponse::isInStock);
+
+        log.info("allProductInStock: {}", allProductInStock);
+
+        if(allProductInStock){
+            orderRepository.save(order);
+        }else{
+            throw new IllegalArgumentException("El producto no esta en stock");
+        }
+
+
 /*
         List<String> codigoSku = order.getOrderLineItems().stream()
                         .map(OrderLineItems::getCodigoSku)
