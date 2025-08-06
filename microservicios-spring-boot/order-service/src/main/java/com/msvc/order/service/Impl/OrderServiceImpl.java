@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderServiceI {
 
             // Aquí va el código que quieres rastrear dentro del span
             InventarioResponse[] inventarioResponseArray = webClientBuilder.build().get()
-                    .uri("http://inventario-service:8082/api/inventario", uriBuilder -> uriBuilder.queryParam("codigoSku", codigoSku).build())
+                    .uri("http://inventario-service/api/inventario", uriBuilder -> uriBuilder.queryParam("codigoSku", codigoSku).build())
                     .retrieve()
                     .bodyToMono(InventarioResponse[].class)
                     .block();
