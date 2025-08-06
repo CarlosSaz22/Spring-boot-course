@@ -8,6 +8,7 @@ import com.msvc.order.model.Order;
 import com.msvc.order.model.OrderLineItems;
 import com.msvc.order.repository.OrderRepository;
 import com.msvc.order.service.OrderServiceI;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +30,11 @@ public class OrderServiceImpl implements OrderServiceI {
     private OrderRepository orderRepository;
 
     @Autowired
-    private WebClient webClient;
+    private WebClient.Builder webClientBuilder;
 
 
-    public void placeOrder(OrderRequest orderRequest) {
+    @Transactional(readOnly = true)
+    public String placeOrder(OrderRequest orderRequest) {
         Order order = new Order();
         order.setNumeroPedido(UUID.randomUUID().toString());
 
@@ -49,8 +51,8 @@ public class OrderServiceImpl implements OrderServiceI {
 
         log.info("Codigo Sku: {}", codigoSku);
 
-        InventarioResponse[] inventarioResponseArray = webClient.get()
-                .uri("http://localhost:8082/api/inventario", uriBuilder -> uriBuilder.queryParam("codigoSku", codigoSku).build())
+        InventarioResponse[] inventarioResponseArray = webClientBuilder.build().get()
+                .uri("http://inventario-service:8082/api/inventario", uriBuilder -> uriBuilder.queryParam("codigoSku", codigoSku).build())
                 .retrieve()
                 .bodyToMono(InventarioResponse[].class)
                 .block();
@@ -62,6 +64,7 @@ public class OrderServiceImpl implements OrderServiceI {
 
         if(allProductInStock){
             orderRepository.save(order);
+            return "Pedido ordenado con exito";
         }else{
             throw new IllegalArgumentException("El producto no esta en stock");
         }
