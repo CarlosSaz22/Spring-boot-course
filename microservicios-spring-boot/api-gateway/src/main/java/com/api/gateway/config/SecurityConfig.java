@@ -20,7 +20,7 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt -> {
-                            // Configuración adicional si es necesaria, o dejar vacío para valores por defecto
+                            // Configuración adicional si es necesaria, o dejar vacio para valores por defecto
                         })
                 );
 
