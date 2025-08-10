@@ -1,6 +1,7 @@
 package com.msvc.order.service.Impl;
 
 
+import com.msvc.order.config.rabbitmq.Producer;
 import com.msvc.order.dto.InventarioResponse;
 import com.msvc.order.dto.OrderLineItemsDto;
 import com.msvc.order.dto.OrderRequest;
@@ -30,6 +31,9 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderServiceI {
 
     @Autowired
+    private Producer producer;
+
+    @Autowired
     private KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     @Autowired
@@ -41,6 +45,11 @@ public class OrderServiceImpl implements OrderServiceI {
     @Autowired
     private Tracer tracer;
 
+
+    private void sendMessageRabbitMQ(String message){
+        log.info("Sending message to RabbitMQ",message);
+        producer.sendMessage(message);
+    }
 
    // @Transactional(readOnly = true)
     public String placeOrder(OrderRequest orderRequest) {
@@ -79,6 +88,7 @@ public class OrderServiceImpl implements OrderServiceI {
 
             if (allProductInStock) {
                 orderRepository.save(order);
+                sendMessageRabbitMQ("Notificacion con RabbitMQ,Pedido ordenado con exito");
                 kafkaTemplate.send("notificationTopic",new OrderPlacedEvent(order.getNumeroPedido()));
                 return "Pedido ordenado con exito";
             } else {

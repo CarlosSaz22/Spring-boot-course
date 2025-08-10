@@ -31,3 +31,10 @@ scrape_configs:
         labels:
           application: 'Notification Service Application'
 
+  - job_name: 'message-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8091' ]
+        labels:
+          application: 'Message Service Application'
+

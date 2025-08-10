@@ -7,8 +7,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
-        <module name="order-service" />
         <module name="discovery-server" />
+        <module name="order-service" />
         <module name="producto-service" />
         <module name="inventario-service" />
       </profile>
@@ -19,6 +19,7 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
+        <module name="message-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
@@ -28,6 +29,7 @@
       <module name="api-gateway" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="inventario-service" options="-parameters" />
+      <module name="message-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="order-service" options="-parameters" />
       <module name="producto-service" options="-parameters" />
