@@ -4,15 +4,16 @@ package com.msvc.order.service.Impl;
 import com.msvc.order.dto.InventarioResponse;
 import com.msvc.order.dto.OrderLineItemsDto;
 import com.msvc.order.dto.OrderRequest;
+import com.msvc.order.event.OrderPlacedEvent;
 import com.msvc.order.model.Order;
 import com.msvc.order.model.OrderLineItems;
 import com.msvc.order.repository.OrderRepository;
 import com.msvc.order.service.OrderServiceI;
 import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,6 +28,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderServiceI {
+
+    @Autowired
+    private KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -75,6 +79,7 @@ public class OrderServiceImpl implements OrderServiceI {
 
             if (allProductInStock) {
                 orderRepository.save(order);
+                kafkaTemplate.send("notificationTopic",new OrderPlacedEvent(order.getNumeroPedido()));
                 return "Pedido ordenado con exito";
             } else {
                 throw new IllegalArgumentException("El producto no esta en stock");
