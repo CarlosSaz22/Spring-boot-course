@@ -36,7 +36,7 @@ public class AccountCommandController {
     @PostMapping("credit")
     public CompletableFuture<String> credito(@RequestBody CreditAccountRequestDTO creditAccountRequestDTO){
         return commandGateway.send(new CreditAccountCommand(
-                UUID.randomUUID().toString(),
+                creditAccountRequestDTO.getAccountId(),
                 creditAccountRequestDTO.getCurrency(),
                 creditAccountRequestDTO.getAmount()
         ));
@@ -45,7 +45,7 @@ public class AccountCommandController {
     @PostMapping("debit")
     public CompletableFuture<String> debito(@RequestBody DebitAccountRequestDTO debitAccountRequestDTO){
         return commandGateway.send(new DebitAccountCommand(
-                UUID.randomUUID().toString(),
+                debitAccountRequestDTO.getAccountId(),
                 debitAccountRequestDTO.getCurrency(),
                 debitAccountRequestDTO.getAmount()
         ));
